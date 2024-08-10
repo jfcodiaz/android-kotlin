@@ -19,8 +19,19 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import okhttp3.Call
 import okhttp3.OkHttpClient
+import retrofit2.Callback
+import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
+import retrofit2.create
+import retrofit2.http.GET
+import retrofit2.http.Path
 
+interface ApiService {
+    @GET("{fileName}")
+    fun getText(@Path("fileName") fileName: String): retrofit2.Call<String>
+}
 class MainActivity : AppCompatActivity() {
 
     private lateinit var requestQueue: RequestQueue
@@ -36,7 +47,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         requestQueue = Volley.newRequestQueue(this)
-        val URL = "https://raw.githubusercontent.com/jfcodiaz/android-kotlin/master/06-http-requests/endpoint/helloword.txt?ok=1"
+        val BASE_URL = "https://raw.githubusercontent.com/jfcodiaz/android-kotlin/master/06-http-requests/endpoint/"
+        val URL = "${BASE_URL}helloword.txt"
         Log.d(URL, URL)
         val btnNativeHttp = findViewById<Button>(R.id.btnNativeHttp);
         val tvResult = findViewById<TextView>(R.id.tvResult)
@@ -73,6 +85,36 @@ class MainActivity : AppCompatActivity() {
                     tvResult.text = result
                 }
             }.start()
+        })
+
+        //Retrofit Simple
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .build()
+        val service = retrofit.create(ApiService::class.java)
+
+        val btnRetrofit = findViewById<Button>(R.id.btnRetrofit)
+        btnRetrofit.setOnClickListener(View.OnClickListener {
+            tvResult.text = "Get Request by Retrfit"
+            val call = service.getText("helloword.txt")
+            call.enqueue(object : Callback<String> {
+                override fun onResponse(call: retrofit2.Call<String>, response: retrofit2.Response<String>) {
+                    runOnUiThread {
+                        if(response.isSuccessful) {
+                            tvResult.text = response.body()
+                        } else {
+                            tvResult.text = "Error: ${response.code()}"
+                        }
+                    }
+                }
+
+                override fun onFailure(call: retrofit2.Call<String>, t: Throwable) {
+                    runOnUiThread{
+                        tvResult.text = "Error: ${t.message}"
+                    }
+                }
+            })
         })
     }
     private fun makeGetRequestWithOkHttp(url: String): String {

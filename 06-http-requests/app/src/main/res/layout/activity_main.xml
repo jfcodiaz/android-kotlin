@@ -52,4 +52,17 @@
         app:layout_constraintTop_toBottomOf="@+id/btnNativeHttp"
         app:layout_constraintVertical_bias="0.009" />
 
+    <Button
+        android:id="@+id/btnRetrofit"
+        android:layout_width="332dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="8dp"
+        android:text="Retrofit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnVolley"
+        app:layout_constraintVertical_bias="0.015" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
